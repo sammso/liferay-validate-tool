@@ -7,6 +7,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -84,14 +85,15 @@ public class ValidateServiceImpl extends ValidateServiceBaseImpl {
 							journalArticle.getContent(),
 							journalArticle.getType(),
 							journalArticle.getStructureId(),
-							journalArticle.getStructureId(),
+							journalArticle.getTemplateId(),
 							journalArticle.getExpirationDate(),
 							journalArticle.getSmallImage(),
 							journalArticle.getSmallImageURL(),
 							image == null ? null : image.getTextObj());
-					_log.error(String.format("OK Article : groupID:%d articleId:%s version:%f ", journalArticle.getGroupId(), journalArticle.getArticleId(), journalArticle.getVersion()));
+					// Uncomment this if you want to list all articles to be scanned
+					// _log.error(String.format("OK Article : groupID:%d articleId:%s version:%f ", journalArticle.getGroupId(), journalArticle.getArticleId(), journalArticle.getVersion()));
 				} catch (PortalException pe) {
-					_log.error(String.format("Article : groupID:%d articleId:%s version:%f ", journalArticle.getGroupId(), journalArticle.getArticleId(), journalArticle.getVersion()), pe);
+					_log.error(String.format("ArticleValidationError : groupID:%d articleId:%s version:%f ", journalArticle.getGroupId(), journalArticle.getArticleId(), journalArticle.getVersion()));
 				}
 			}
 
@@ -146,10 +148,10 @@ public class ValidateServiceImpl extends ValidateServiceBaseImpl {
 		}
 
 		validateContent(content);
-
+		
 		if (Validator.isNotNull(ddmStructureKey)) {
 			DDMStructure ddmStructure = DDMStructureLocalServiceUtil
-					.getStructure(PortalUtil.getSiteGroupId(groupId),
+					.getStructure(groupId,
 							PortalUtil.getClassNameId(JournalArticle.class),
 							ddmStructureKey, true);
 
@@ -157,7 +159,7 @@ public class ValidateServiceImpl extends ValidateServiceBaseImpl {
 
 			if (Validator.isNotNull(ddmTemplateKey)) {
 				DDMTemplate ddmTemplate = DDMTemplateLocalServiceUtil
-						.getTemplate(PortalUtil.getSiteGroupId(groupId),
+						.getTemplate(groupId,
 								PortalUtil.getClassNameId(DDMStructure.class),
 								ddmTemplateKey, true);
 
@@ -176,7 +178,7 @@ public class ValidateServiceImpl extends ValidateServiceBaseImpl {
 
 			throw new ArticleExpirationDateException();
 		}
-
+/*
 		String[] imageExtensions = PrefsPropsUtil.getStringArray(
 				PropsKeys.JOURNAL_IMAGE_EXTENSIONS, StringPool.COMMA);
 
@@ -188,6 +190,7 @@ public class ValidateServiceImpl extends ValidateServiceBaseImpl {
 
 			throw new ArticleSmallImageSizeException();
 		}
+*/
 	}
 
 	protected void validateContent(String content) throws PortalException {
